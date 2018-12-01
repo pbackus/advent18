@@ -11,20 +11,22 @@ import std.typecons;
 
 void main()
 {
-	int[int] counts;
+	bool[int] seen;
 
 	stdin.readChanges
 		.array
 		.cycle
 		.pipe!(changes => chain(only(0), changes))
 		.cumulativeFold!((freq, change) => freq + change)
-		.map!((freq) {
-			counts[freq] = counts.get(freq, 0) + 1;
-			return tuple(freq, counts[freq]);
+		.filter!((freq) {
+			if (freq in seen) {
+				return true;
+			} else {
+				seen[freq] = true;
+				return false;
+			}
 		})
-		.find!(unpack!((freq, count) => count == 2))
 		.front
-		.unpack!((freq, count) => freq)
 		.writeln;
 }
 
